@@ -52,4 +52,4 @@ const { refreshToken } = req.body;
     }
 });
   
-  
+module.exports = router;
