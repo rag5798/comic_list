@@ -70,7 +70,7 @@ router.get('/volume/search', auth, async (req, res) => {
     return res.status(400).json({ error: 'Search term must be between 2 and 50 characters.' });
     }
 
-    if (!/^[a-zA-Z0-9\s\-\'\.]+$/.test(query)) {
+    if (!/^[a-zA-Z0-9\s\-\']+$/.test(query)) {
     return res.status(400).json({ error: 'Search term contains invalid characters.' });
     }
 
