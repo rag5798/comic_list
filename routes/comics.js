@@ -44,7 +44,7 @@ router.get('/volume/:id', auth, async (req, res) => {
                   field_list: 'cover_date,id,image,name,volume,api_detail_url,issue_number,person_credits,first_appearance_characters'
                 }
             });
-            issueList.push(json.results);
+            issueList.push(issueData.results);
 
             await delay(1500);
         }
@@ -59,7 +59,7 @@ router.get('/volume/:id', auth, async (req, res) => {
         console.error(err);
         res.status(500).json({ error: 'Failed to fetch issues from volume.' });
     }
-  });
+});
   
 
 router.get('/volume/search', auth, async (req, res) => {
