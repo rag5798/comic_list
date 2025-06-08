@@ -67,11 +67,11 @@ router.get('/volume/search', auth, async (req, res) => {
     const offset = parseInt(req.query.offset) || 0;
 
     if (!query || typeof query !== 'string' || query.length < 2 || query.length > 50) {
-    return res.status(400).json({ error: 'Search term must be between 2 and 50 characters.' });
+        return res.status(400).json({ error: 'Search term must be between 2 and 50 characters.' });
     }
 
     if (!/^[a-zA-Z0-9\s\-\']+$/.test(query)) {
-    return res.status(400).json({ error: 'Search term contains invalid characters.' });
+        return res.status(400).json({ error: 'Search term contains invalid characters.' });
     }
 
     const cleanQuery = query.trim().replace(/\s+/g, ' ');

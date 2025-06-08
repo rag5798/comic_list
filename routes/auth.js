@@ -22,7 +22,27 @@ router.post('/register', async (req, res) => {
     const hashed = await bcrypt.hash(password, 10);
     const user = await User.create({ email, password: hashed });
 
-    res.status(201).json({ message: 'User registered' });
+    const accessToken = jwt.sign(
+        { userId: user._id, role: user.role },
+        JWT_SECRET,
+        { expiresIn: '15m' }
+    );
+
+    const refreshToken = jwt.sign(
+        { userId: user._id },
+        JWT_SECRET,
+        { expiresIn: '30d' }
+    );
+
+    user.refreshToken = refreshToken;
+    user.refreshTokenExpiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+    await user.save();
+
+    res.status(201).json({
+        accessToken,
+        refreshToken,
+        user: { email: user.email, role: user.role }
+    });
 });
 
 // POST /api/auth/login
