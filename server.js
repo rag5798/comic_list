@@ -17,10 +17,16 @@ app.use(express.json());
 const authRoutes = require('./routes/auth');
 const refreshRoutes = require('./routes/refresh');
 const comicsRoutes = require('./routes/comics');
+const collectionRoutes = require('./routes/collection');
 
+app.use('/api/collection', collectionRoutes);
 app.use('/api/auth', authRoutes);
-app.use('/api/auth', refreshRoutes);
+app.use('/api/account', refreshRoutes);
 app.use('/api/volume', comicsRoutes);
+app.use((req, res, next) => {
+  console.log(`[${req.method}] ${req.originalUrl}`);
+  next();
+});
 
 // Connect to MongoDB
 mongoose.connect(MONGO_URI)
