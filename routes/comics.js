@@ -106,41 +106,51 @@ router.get('/issue', auth, async (req, res) => {
 
 router.get('/search', auth, async (req, res) => {
     const query = req.query.name;
-    console.log(query)
     const offset = parseInt(req.query.offset) || 0;
 
+    const sortField = req.query.sortField || 'start_year';
+    const sortDirection = req.query.sortDirection === 'desc' ? 'desc' : 'asc';
+
+    const filterField = req.query.filterField;
+    const filterValue = req.query.filterValue;
+
     if (!query || typeof query !== 'string' || query.length < 2 || query.length > 50) {
-        console.log('validation error')
         return res.status(400).json({ error: 'Search term must be between 2 and 50 characters.' });
     }
 
     if (!/^[a-zA-Z0-9\s\-\']+$/.test(query)) {
-        console.log('validation error')
         return res.status(400).json({ error: 'Search term contains invalid characters.' });
     }
 
     const cleanQuery = query.trim().replace(/\s+/g, ' ');
-    console.log(cleanQuery)
 
-    try{
+    // Construct filter string
+    let filter = `name:${cleanQuery}`;
+    if (filterField && filterValue) {
+        filter += `,${filterField}:${filterValue}`;
+    }
+
+    const sort = `${sortField}:${sortDirection}`;
+
+    console.log(`Filter: ${filter} and Sort: ${sort}`)
+
+    try {
         const { data } = await axios.get(`${API_BASE}/volumes`, {
             params: {
-            api_key: API_KEY,
-            format: 'json',
-            offset: offset,
-            filter: `name:${cleanQuery}`,
-            sort: 'start_date:desc'
+                api_key: API_KEY,
+                format: 'json',
+                offset,
+                filter,
+                sort,
             }
         });
 
         if (!data.results || data.results.length === 0) {
-            console.log('error')
             return res.status(404).json({ error: 'No matching volumes found.' });
         }
 
-        console.log(data)
-
         const moreAvailable = offset + data.number_of_page_results < data.number_of_total_results;
+
         res.json({
             offset,
             total: data.number_of_total_results,
@@ -148,7 +158,7 @@ router.get('/search', auth, async (req, res) => {
             moreAvailable,
             results: data.results,
         });
-    }catch (err){
+    } catch (err) {
         console.error(err);
         res.status(500).json({ error: 'Failed to search for volumes.' });
     }
